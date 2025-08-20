@@ -1,8 +1,16 @@
-pyspark==3.5.1
-pandas==2.2.2
-numpy==1.26.4
-matplotlib==3.8.4
-seaborn==0.13.2
-scipy==1.11.4
-statsmodels==0.14.2
-tabulate==0.9.0
+# Core
+pyspark>=3.5.1,<4.0
+pandas>=2.1
+pyarrow>=14
+numpy>=1.26
+
+# Stats / plotting
+scipy>=1.12
+statsmodels>=0.14
+matplotlib>=3.8
+seaborn>=0.13
+
+# Utils
+tabulate>=0.9         # pandas.DataFrame.to_markdown에 필요
+packaging>=23.1       # PySpark 일부 경로에서 참조
+setuptools>=68        # Py3.12 환경 호환성
