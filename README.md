@@ -1,4 +1,4 @@
-App Usage × Sleep ↔ Mental Health (Portfolio)
+## App Usage × Sleep ↔ Mental Health (Portfolio)
 
 스마트폰 앱 사용량(카테고리별), 수면 신뢰도/중도각성, 정신건강 설문(PHQ-9, GAD-7, Stress) 를 결합해 관계를 분석했습니다.
 대용량 전처리는 PySpark, 분석은 Spearman+FDR(다중비교 보정)과 조절 회귀(클러스터-강건 SE) 로 수행했습니다.
