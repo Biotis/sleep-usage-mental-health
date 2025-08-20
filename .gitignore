@@ -1,21 +1,21 @@
-# python
+# Python
 __pycache__/
 *.pyc
 .venv/
 venv/
 
-# jupyter
+# Jupyter
 .ipynb_checkpoints/
 *.ipynb_convert/
 *.nbconvert.ipynb
 
-# data & results (원본/대용량 미커밋)
-data/*.csv
-data/*.parquet
-data/*.json
-data/*/
-!data/samples/**
+# Data & large files (exclude all except samples)
+data/
+all_data/
+!data/samples/** 
+!all_data/samples/**
 
+# Results (exclude raw large results)
 results/**/*.parquet
 results/**/*.feather
 
