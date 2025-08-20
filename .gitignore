@@ -1,0 +1,26 @@
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# jupyter
+.ipynb_checkpoints/
+*.ipynb_convert/
+*.nbconvert.ipynb
+
+# data & results (원본/대용량 미커밋)
+data/*.csv
+data/*.parquet
+data/*.json
+data/*/
+!data/samples/**
+
+results/**/*.parquet
+results/**/*.feather
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

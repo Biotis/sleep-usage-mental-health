@@ -1,0 +1,26 @@
+
+---
+
+# 5) `docs/methodology.md` (간단 근거 템플릿)
+
+```markdown
+# Methodology Notes
+
+## Normality & Correlation
+- App usage 변수 전반이 심한 우측 꼬리 → Shapiro-Wilk, D’Agostino-Pearson 모두 p<.001.
+- 따라서 Pearson 대신 **Spearman** 사용 (순위 기반, 이상치 영향 완화).
+
+## Moderation (Interaction)
+- 수면 지표(`mean_confidence_sleep_centered`)가 앱 사용(X)과 정신건강(Y) 간 관계를 조절하는지 검증:
+  - `Y = β0 + β1·Xc + β2·Sc + β3·(Xc×Sc) + ε`
+  - 해석: β3 유의 → 조절효과 존재. 단, 인과 아님.
+
+## Multicollinearity
+- 상호작용 포함 시 VIF 확인:
+  - 입력 벡터: `[Xc, Sc, Xc×Sc]`  
+  - VIF > 10 경계, 필요 시 정규화/표준화/샘플링 고려.
+
+## Robustness Ideas (미구현 제안)
+- 개별 주차 고정효과, 사용자 고정효과(패널 모형)  
+- 범주 다중 비교 보정(FDR)  
+- 비선형(스플라인) / 혼합모형 시도
