@@ -6,7 +6,7 @@
 - **목표**: 앱 사용량(카테고리), 수면 지표와 정신건강 점수(PHQ-9, GAD-7, Stress) 간 관계를 탐색하고, **수면 상태가 관계를 조절**하는지 검증.
 - **핵심 질문**
   1) 단순 상관(앱 사용량 ↔ 설문 점수)은 존재하는가?  
-  2) 수면 신뢰도(평균)가 높고/낮음에 따라 그 관계의 **기울기**가 달라지는가?
+  2) 수면 신뢰도가 높고/낮음에 따라 그 관계의 **기울기**가 달라지는가?
 
 ## 2) 데이터 소스 (비공개)
 - `filtering_complete_app_usage.csv`: `uid`, `week`, `category`, `duration(초)`.  
@@ -26,17 +26,15 @@
 - 모든 앱 시간 열을 **시간 단위**로 변환해 `*_hours` 파생.
 
 ### 3.3 수면 지표
-- `meanConfidence`를 주차 평균.  
-- `midawake_duration`은 `"HH:MM:SS"`를 **분** 단위로 변환 후 주차 평균.
+- `meanConfidence`를 주차 평균으로 집계 → `mean_confidence_sleep`
+- `midawake_duration`은 `"HH:MM:SS"`를 **분** 단위로 변환 후 주차 평균 → `midawake_duration_sleep`
 
 ### 3.4 정규화·조인·결측
 - `week`를 문자열 정규화(예: `"8.0"`→`8`) 후 **정수**로 통일, `uid`는 문자열화.
-- 조인: `app_pivot ⨝ response`(inner) → `sleep`/`sleep_diary`(left).
+- 조인 순서: `app_pivot ⨝ response`(inner) → `sleep`/`sleep_diary`(left).
 - 결측: 수면 관련 열을 **전체 평균으로 대치**.
 - `uid, week` 중복 제거.
 - **출력**: `notebooks/results/tables/processed_weekly/` (Parquet).
-
-> 전처리 결과의 예시 규모: N ≈ 552 (`uid×week` 행, 프로젝트 시점 기준).
 
 ## 4) 기술통계·상관 (02_correlation_analysis.ipynb)
 
@@ -45,8 +43,8 @@
 - **상관**: Spearman(순위 기반)으로 `*_hours` ↔ `PHQ9/GAD7/Stress`.  
 - **다중비교 보정**: Benjamini–Hochberg **FDR(q=0.05)**.  
 - **보고 정책**:
-  - **확증(가설 기반)**: 이론적으로 의미 있는 소수 쌍만 별도 FDR 적용(옵션).
-  - **탐색**: 전 조합의 보정 전 Top-K를 **참고용**으로 병기.
+  - **확증(가설 기반)**: 이론적으로 의미 있는 소수 쌍만 별도 FDR 적용.
+  - **탐색**: 전 조합의 보정 전 Top-K를 **참고용**으로 작성
 
 ## 5) 회귀·조절효과 (03_regression_analysis.ipynb)
 
@@ -67,8 +65,8 @@
 > 선택 분석: **within-person(디미닝)** 또는 혼합효과모형으로 개인 내 변동만 추정 가능.
 
 ## 6) 해석 가이드
-- FDR 보정 하에서 전 조합 단순 상관은 유의하지 않을 수 있음(파워 손실 + 제로-많음·긴 꼬리).  
-- 그러나 조절효과 분석에서 **SOCIAL/GAME × 수면 신뢰도**가 일부 지표에서 유의 → **맥락 의존적 관계** 시사.
+- FDR 보정 하에서 전 조합 단순 상관은 유의하지 않을 수 있음(0이 많고 꼬리가 긴 분포 + 보정으로 인한 파워 감소).  
+- 그러나 조절효과 분석에서 **SOCIAL/GAME × 수면 신뢰도**가 일부 지표에서 유의 → 수면 상태에 따라 앱 사용의 영향이 달라질 수 있음
 - 낮은 R²는 추가 요인의 영향 가능성을 암시.
 
 ## 7) 소프트웨어·환경
