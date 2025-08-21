@@ -28,11 +28,11 @@
 > 분석 결과
 <p float="left">
   <figure style="display:inline-block; width:49%">
-    <figcaption align="center">- 앱 사용시간과 정신건강 점수 분포 (0이 많고 일부 극단치 존재)</figcaption>
+    <figcaption align="center">- 1.  앱 카테고리 별 사용시간 분포(IV) (0이 많고 일부 극단치 존재)</figcaption>
     <img src="notebooks/results/figures/dist_panels.png" width="50%" />
   </figure>
   <figure style="display:inline-block; width:49%">
-    <figcaption align="center">앱 사용 ↔ 정신건강 지표 Spearman 상관 (전반적으로 약한 상관)</figcaption>
+    <figcaption align="center">2. 앱 카테고리 별 사용시간(IV) ↔ 정신건강 지표 Spearman 상관분석(DV) (전반적으로 약한 상관)</figcaption>
     <img src="notebooks/results/figures/spearman_heatmap.png" width="50%" />
   </figure>
 </p>
