@@ -1,20 +1,19 @@
 # Methodology
 
-본 문서는 데이터 소스, 전처리, 변수 생성, 분석 절차(Spearman + FDR, 조절 회귀)를 기술합니다. 구현은 `notebooks/01–03`에 대응합니다.
+본 문서는 데이터 소스, 전처리, 변수 생성, 분석 절차를 간단히 요약합니다. 상세 설명은 `notebooks/01–03`과 [README.md](../README.md)를 참고하세요.
 
 ## 1) 연구 개요·질문
 - **목표**: 앱 사용량(카테고리), 수면 지표와 정신건강 점수(PHQ-9, GAD-7, Stress) 간 관계를 탐색하고, **수면 상태가 관계를 조절**하는지 검증.
 - **핵심 질문**
-  1) 단순 상관(앱 사용량 ↔ 설문 점수)은 존재하는가?  
-  2) 수면 신뢰도가 높고/낮음에 따라 그 관계의 **기울기**가 달라지는가?
+  1) 앱 사용량과 정신건강 점수 간 단순 상관이 존재하는가?
+  2) 수면의 질(신뢰도)에 따라 그 관계의 기울기가 달라지는가?
 
 ## 2) 데이터 소스 (비공개)
-- `filtering_complete_app_usage.csv`: `uid`, `week`, `category`, `duration(초)`.  
-- `response_week_mapping_adjusted.csv`: `uid`, `week`, `PHQ-9`, `GAD-7`, `Stress Questionnaire`(문항 배열 JSON 문자열).  
-- `sleep_week_mapped.csv`: `uid`, `week`, `meanConfidence`(수면 센서 신뢰도).  
-- `sleep_diary_week_mapped.csv`: `uid`, `week`, `midawake_duration`(HH:MM:SS).
+- `앱 사용 로그`: `uid`, `week`, `category`, `duration(초)`
+- `정신건강 설문`: `PHQ-9`, `GAD-7`, `Stress Questionnaire`(JSON 문항)
+- `수면 데이터`: `meanConfidence`(수면 품질 신뢰도), `midawake_duration`(중간에 깬 시간)
 
-> 원본 파일은 공개하지 않으며, 분석 재현용 산출물만 제공됩니다.
+> 원본 파일은 공개하지 않으며, 산출물만 제공됩니다.
 
 ## 3) 전처리 (01_data_preprocessing.ipynb)
 
@@ -40,7 +39,7 @@
 
 - **기술통계**: 평균/표준편차/사분위수/중앙값 저장(→ `descriptive_stats.csv`).
 - **분포 시각화**: 카테고리별 `*_hours` + 설문 점수 히스토그램(→ `dist_panels.png`).
-- **상관**: Spearman(순위 기반)으로 `*_hours` ↔ `PHQ9/GAD7/Stress`.  
+- **상관분석**: Spearman(순위 기반)으로 `*_hours` ↔ `PHQ9/GAD7/Stress` 상관계수 산출
 - **다중비교 보정**: Benjamini–Hochberg **FDR(q=0.05)**.  
 - **보고 정책**:
   - **확증(가설 기반)**: 이론적으로 의미 있는 소수 쌍만 별도 FDR 적용.
@@ -62,21 +61,20 @@
 - **다중공선성**: VIF 계산.  
 - **결과물**: 계수표(`moderation_step3_APA.csv`), 조절 플롯(`moderation_*_*.png`).
 
-> 선택 분석: **within-person(디미닝)** 또는 혼합효과모형으로 개인 내 변동만 추정 가능.
-
-## 6) 해석 가이드
+## 6) 해석
 - FDR 보정 하에서 전 조합 단순 상관은 유의하지 않을 수 있음(0이 많고 꼬리가 긴 분포 + 보정으로 인한 파워 감소).  
 - 그러나 조절효과 분석에서 **SOCIAL/GAME × 수면 신뢰도**가 일부 지표에서 유의 → 수면 상태에 따라 앱 사용의 영향이 달라질 수 있음
-- 낮은 R²는 추가 요인의 영향 가능성을 암시.
+- 낮은 R²는 다른 공변량을 고려하는 것의 필요성을 보여줌
 
 ## 7) 소프트웨어·환경
 - Python 3.11/3.12, **PySpark 3.5.x**, pandas, numpy, scipy, statsmodels, pyarrow, matplotlib/seaborn.  
 - 일부 환경에서 PySpark↔Python 3.12 조합은 `distutils` 이슈가 있어 `pyspark`, `setuptools`, `packaging` 최신 버전을 권장.
 
-## 8) 재현 안내
+## 8) 재현 방법
 1) `all_data/`에 원본 CSV 배치(비공개).  
 2) `01 → 02 → 03` 노트북 순서 실행.  
 3) `python scripts/build_results_summary.py` 실행 → `docs/results_summary.md` 생성.
 
+
 ## 9) 한계·윤리
-- 세부 사항은 **`docs/limitations_ethicss.md`** 참고.
+- 세부 사항은 **[docs/limitations_ethics.md](limitations_ethics.md)** 참고.
