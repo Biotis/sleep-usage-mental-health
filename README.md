@@ -96,6 +96,8 @@
 
 **구현: PySpark 전처리 → pandas/scipy/statsmodels 분석**
 
+> 자세한 내용: [docs/methodology.md](docs/methodology.md)
+
 ---
 
 ## How to Run (데이터 비공개)
@@ -146,7 +148,7 @@ spearman_fdr_hypotheses.csv, spearman_exploratory_top.csv
 - 원본 데이터는 **비공개**(개인/민감정보 보호)  
 - **주차별 데이터에서 특정 카테고리의 앱을 전혀 사용하지않는 사람(0이 많음)**과 아주 오래 쓰는 소수가 함께 있어, 단순 상관관계분석으로는 관계가 약하게 보일 수 있음
 - R² 낮음 → 다른 요인(예: 생활 패턴, 스트레스 요인 등)이나 다른 분석 방법(로그 변환, 상위값 절제, 혼합모형 등)을 추가해 볼 여지가 존재함
-- 자세한 내용: `docs/limitations_ethics.md`
+- 자세한 내용: [docs/limitations_ethics.md](docs/limitations_ethics.md)
 
 ---
 
