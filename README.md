@@ -1,33 +1,52 @@
 ## App Usage × Sleep ↔ Mental Health
 
-스마트폰 앱 사용량(카테고리별), 수면 지표(신뢰도·밤중 깬 시간(분)), 정신건강 설문(PHQ-9/GAD-7/Stress)을 결합해 관계성을 분석했습니다.  
-전처리는 **PySpark**, 분석은 **Spearman+FDR(다중비교 보정)** 및 **조절 회귀(클러스터-강건 SE)** 로 수행했습니다.  
+스마트폰 앱 사용이 우울·불안·스트레스와 같은 정신건강 지표에 어떤 영향을 미치는지, 그리고 **수면의 질이 이 관계를 어떻게 조절하는지**를 분석한 프로젝트입니다.
+
 **데이터는 비공개**이며, 코드와 결과물(표/그림)만 공개합니다.
 
+---
 
-(**보정** = 여러 항목을 동시에 비교할 때 생길 수 있는 우연을 줄이기 위해 p값을 조정(FDR 보정) 했다는 의미)
+## Hypothesis (연구 가설)
+
+**가설**:
+
+“특정 카테고리의 앱 사용 시간이 증가할수록, 우울·불안·스트레스 지표가 악화되며, 이 관계는 사용자의 수면의 질에 따라 달라질 것이다.”
+
+→ 즉, 앱 사용량(독립변수)과 정신건강 지표(종속변수) 사이의 관계는 **수면의 질(조절변수)** 에 의해 강화되거나 약화될 수 있다.
+
+- **H_main(주효과)**: 앱 사용 시간이 늘수록 PHQ-9 / GAD-7 / Stress 점수가 **악화**된다.
+- **H_mod(조절효과)**: 이 관계는 **수면의 질(mean_confidence)** 에 따라 **달라진다**
+  (수면의 질이 높을수록 ‘정신 건강 악화 기울기’가 **완만**해지는 방향을 기대).
 
 ---
 
 ## Preview
 
+자세한 표/요약 👉 [docs/results_summary.md](docs/results_summary.md)
+
+
+> 분석 결과
 <p float="left">
-  <img src="notebooks/results/figures/dist_panels.png" width="49%" />
-  <img src="notebooks/results/figures/spearman_heatmap.png" width="49%" />
+  <figure style="display:inline-block; width:49%">
+    <figcaption align="center">- 앱 사용시간과 정신건강 점수 분포 (0이 많고 일부 극단치 존재)</figcaption>
+    <img src="notebooks/results/figures/dist_panels.png" width="50%" />
+  </figure>
+  <figure style="display:inline-block; width:49%">
+    <figcaption align="center">앱 사용 ↔ 정신건강 지표 Spearman 상관 (전반적으로 약한 상관)</figcaption>
+    <img src="notebooks/results/figures/spearman_heatmap.png" width="50%" />
+  </figure>
 </p>
+
 <p float="left">
-  <img src="notebooks/results/figures/moderation_SOCIAL_PHQ9_score.png" width="49%" />
-  <img src="notebooks/results/figures/moderation_GAME_PHQ9_score.png" width="49%" />
+  <figure style="display:inline-block; width:49%">
+    <figcaption align="center">Social APP 사용 × 수면 질 → PHQ-9</figcaption>
+    <img src="notebooks/results/figures/moderation_SOCIAL_PHQ9_score.png" width="50%" />
+  </figure>
+  <figure style="display:inline-block; width:49%">
+    <figcaption align="center">Game APP 사용 × 수면 질 → PHQ-9 (좋은 수면은 완화, 나쁜 수면은 악화)</figcaption>
+    <img src="notebooks/results/figures/moderation_GAME_PHQ9_score.png" width="50%" />
+  </figure>
 </p>
-
-자세한 표/요약 👉 **[docs/results_summary.md](docs/results_summary.md)**
-
----
-
-## Hypothesis (연구 가설)
-- **H_main(주효과)**: 앱 사용 시간이 늘수록 PHQ-9 / GAD-7 / Stress 점수가 **악화**된다.
-- **H_mod(조절효과)**: 이 관계는 **수면의 질(mean_confidence)** 에 따라 **달라진다**
-  (수면의 질이 높을수록 ‘정신 건강 악화 기울기’가 **완만**해지는 방향을 기대).
 
 ---
 
@@ -43,7 +62,6 @@
 
 > 보고 원칙: **가설 기반 비교(확증적)** = {SNS×수면, GAME×수면} × {PHQ-9, GAD-7, Stress} **6개**에만 **FDR 보정**을 적용하였음.
 > 그 외 전수 탐색(다른 카테고리 전부)은 **보정 전 값 참고용**으로 별도로 기술하였음.
-
 
 ---
 
@@ -72,24 +90,11 @@
 
 ## Methods
 
-**01 전처리**  
-- 설문 JSON 에서 점수 계산(PHQ-9 / GAD-7 / Stress) 
-- 앱 사용 시간을 카테고리별 열로 정리(초 → 시간 단위 파생)
-- 수면: 잠을 얼마나 잘 잤다고 느꼈는지(평균), 밤중에 깨어 있었던 시간(분) 계산
-- 'week'/'uid' 형식 통일, 결측치는 평균으로 채움 → **Parquet 저장**
+**데이터: 앱 사용 로그(카테고리별), 수면 기록(meanConfidence, midawake), 정신건강 설문(PHQ-9, GAD-7, Stress)**
 
-**02 상관/기술통계**  
-- 분포/요약통계 확인, 상관분석 진행
-- Spearman 상관관계분석 + **FDR(BH) 보정** (*가설 기반 vs 탐색적* 분리하여 확인)
+**분석: Spearman 상관 + Benjamini–Hochberg FDR 보정, 조절 회귀(cluster-robust SE)**
 
-**03 회귀(조절효과)**  
-- 앱 사용 시간과 수면 지표를 **중심화**
-- 앱 사용 시간 × 수면 지표 **상호작용**을 넣어, 수면 상태에 따라 영향이 달라지는지 확인   
-- 단계적 회귀(Step1~3), **cluster-robust SE (groups=uid)**  
-- VIF, 조절 플롯 저장
-- **조절 변수**: 수면의 질(mean_confidence).  
-- 상호작용: `AppCategory_*_hours(중심화) × 수면의 질(중심화)
-
+**구현: PySpark 전처리 → pandas/scipy/statsmodels 분석**
 
 ---
 
